@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  arch:
+    image: structurizr/lite
+    profiles:
+      - manual
+    volumes:
+      - ./docs/architecture:/usr/local/structurizr
+    ports:
+      - "8080:8080"
