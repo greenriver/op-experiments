@@ -1,0 +1,7 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+trigger:
+  label: trigger
+  workflow: simple
+  source_state: initial
+  destination_state: final
