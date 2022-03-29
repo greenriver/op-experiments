@@ -7,46 +7,53 @@ workspace "OpenPath 2" {
 
         enterprise "OpenPath" {
             hmis = softwareSystem "OpenPath HMIS" {
-                hmis_server = container "HMIS Server-side"
-                ui = container "HMIS UI"
+                ui = container "HMIS UI" {
+                    react_app = component "React App"
+                }
             }
             warehouse = softwareSystem "Warehouse" "OpenPath analytic warehouse" {
                 warehouse_database = container "Warehouse Database" {
-                    hmis_api = component "Client Data API"
+                    hmis_api = component "HMIS Client Data API"
                     workflow_api = component "Workflow API"
+                    aggregated_client_api = component "Agreggated Client Data API"
+                    access_control_api = component "Access Control API"
                 }
             }
 
-            ui -> hmis_api "Care-coordination"
-            ui -> workflow_api "More care-coordination"
+            workflow_api -> react_app "Provides workflow information"
 
-            hmis -> warehouse "Sends client data (HMIS CSV)"
-            hmis -> warehouse "Sends non HMIS-data (API)"
-            warehouse -> hmis "Transmits aggregated client data (API)"
+            hmis -> warehouse "Sends client data" "HMIS CSV"
+            hmis -> warehouse "Sends non HMIS-data" "GraphQL"
+            warehouse -> hmis "Sends client data" "GraphQL"
 
-            external_hmis -> warehouse "Include third-party client data (HMIS CSV)"
-            external_hmis -> warehouse "Sends extended client data (API)"
+            aggregated_client_api -> ui "Provides Agreggated Client Data" "GraphQL"
+            react_app -> hmis_api "Consumes HMIS Client Data" "GraphQL"
+            react_app -> access_control_api "Obey Access Controls" "GraphQL"
+            hmis_api -> react_app "Provides HMIS Client Data" "GraphQL"
+
+            external_hmis -> warehouse "Include third-party client data" "HMIS CSV"
+            external_hmis -> warehouse "Sends extended client data" "GraphQL"
             external_openpath -> warehouse "Sends client PII"
-            
-            external_datasource -> warehouse "Sends extended client data (API)"
+
+            external_datasource -> warehouse "Sends extended client data" "API"
         }
     }
 
     views {
-        # systemLandscape "OpenPath-2" "The OpenPath 2 System Landscape" {
-        #     include *
-        #     autoLayout
-        # }
+        systemLandscape "OpenPath-2" "The OpenPath 2 System Landscape" {
+            include *
+            autoLayout
+        }
 
         systemContext hmis {
             include *
             autoLayout
         }
 
-        systemContext warehouse {
-            include *
-            autoLayout
-        }
+        // systemContext warehouse {
+        //     include *
+        //     autoLayout
+        // }
 
         container warehouse {
             include *
@@ -54,6 +61,11 @@ workspace "OpenPath 2" {
         }
 
         container hmis {
+            include *
+            autoLayout
+        }
+
+        component ui {
             include *
             autoLayout
         }
